@@ -1,14 +1,20 @@
 package ui.adapter
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dluche.R
 import extention.getBrFormattedDate
+import extention.getBrFormattedDecimal
+import extention.limitaEmAte
 import kotlinx.android.synthetic.main.transacao_item.view.*
+import model.Tipo
 import model.Transacao
 
+private const val limiteDaCategoria = 14
 
 class ListaTransacoesAdapter(private val transacoes: List<Transacao>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -35,11 +41,43 @@ class ListaTransacoesAdapter(private val transacoes: List<Transacao>) : Recycler
         private val valor = itemV.transacao_valor
 
         fun bindData(itemS : Transacao){
-            categoria.text = itemS.categoria
-            data.text =  itemS.data.getBrFormattedDate()
-            valor.text = itemS.valor.toString()
+            defineData(itemS)
+            defineValor(itemS)
+            defineCategoria(itemS)
+            //
+            defineValorTextColor(itemS.tipo)
+            defineIcon(itemS.tipo)
+        }
+
+        private fun defineCategoria(itemS: Transacao) {
+            categoria.text = itemS.categoria.limitaEmAte(limiteDaCategoria)
+        }
+
+        private fun defineValor(itemS: Transacao) {
+            valor.text = itemS.valor.getBrFormattedDecimal()
+        }
+
+        private fun defineData(itemS: Transacao) {
+            data.text = itemS.data.getBrFormattedDate()
+        }
+
+        private fun defineIcon(tipo: Tipo) {
+            val icon: Int =
+            when(tipo){
+                Tipo.RECEITA -> R.drawable.icone_transacao_item_receita
+                else -> R.drawable.icone_transacao_item_despesa
+            }
+            //
+            icone.setBackgroundResource(icon)
+        }
+
+        fun defineValorTextColor(tipo: Tipo){
+            val cor : Int = when(tipo){
+                            Tipo.RECEITA -> R.color.receita
+                            else -> R.color.despesa
+                        }
+            //
+            valor.setTextColor(ContextCompat.getColor(itemV.context,cor))
         }
     }
-
-
 }
