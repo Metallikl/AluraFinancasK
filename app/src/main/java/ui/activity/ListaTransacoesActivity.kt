@@ -1,16 +1,15 @@
 package ui.activity
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dluche.R
 import kotlinx.android.synthetic.main.activity_lista_transacoes.*
 import model.Tipo
 import model.Transacao
+import ui.ResumoView
 import ui.adapter.ListaTransacoesAdapter
 import java.math.BigDecimal
-import java.util.*
 
 
 class ListaTransacoesActivity : AppCompatActivity() {
@@ -20,8 +19,17 @@ class ListaTransacoesActivity : AppCompatActivity() {
         setContentView(R.layout.activity_lista_transacoes)
         //
         val transacoes: List<Transacao> = transacoesDeExemplo()
+        configuraResumo(transacoes)
         //
         configuraLista(transacoes)
+    }
+
+    private fun configuraResumo(transacoes: List<Transacao>) {
+        // window.decorView retorna a view da Activity
+        val view = window.decorView
+        val resumoView = ResumoView(view, transacoes)
+        resumoView.adicionaReceita()
+        resumoView.adicionaDespesa()
     }
 
     private fun configuraLista(transacoes: List<Transacao>) {
