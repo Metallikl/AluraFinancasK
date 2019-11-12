@@ -2,9 +2,9 @@ package extention
 
 import java.math.BigDecimal
 import java.text.DecimalFormat
-import java.util.Locale
+import java.util.*
 
 fun BigDecimal.getBrFormattedDecimal(): String {
     val formatoBr = DecimalFormat.getCurrencyInstance(Locale("pt", "br"))
-    return formatoBr.format(this)
+    return formatoBr.format(this).replace("-R$","R$ -")
 }
