@@ -20,32 +20,38 @@ import java.util.*
 
 class AdicionaTransacaoDialog(
     private val context: Context,
-    private val viewGroup: ViewGroup) {
+    private val viewGroup: ViewGroup
+) {
 
-    val dialogView = criaLayout()
+    private val dialogView = criaLayout()
+    private val campoData = dialogView.form_transacao_data
+    private val campoValor = dialogView.form_transacao_valor
+    private val campoCategoria = dialogView.form_transacao_categoria
 
-    fun configuraDialog(transacaoDelegate: TransacaoDelegate) {
+    fun chama(tipo: Tipo, transacaoDelegate: TransacaoDelegate) {
         configuraCampoData()
-        configuraCampoCategoria()
-        configuraForm(transacaoDelegate)
+        configuraCampoCategoria(tipo)
+        configuraForm(tipo, transacaoDelegate)
     }
 
-    private fun configuraForm(transacaoDelegate: TransacaoDelegate) {
+    private fun configuraForm(tipo: Tipo, transacaoDelegate: TransacaoDelegate) {
+        val titulo = tituloPorTipo(tipo)
+        //
         AlertDialog.Builder(context).apply {
-            setTitle(R.string.adiciona_receita)
+            setTitle(titulo)
             setView(dialogView)
             setPositiveButton(
                 "Adicionar"
             ) { _, _ ->
-                val valorEmTexto = dialogView.form_transacao_valor.text.toString()
-                val dataEmTexto = dialogView.form_transacao_data.text.toString()
-                val categoriaEmTexto = dialogView.form_transacao_categoria.selectedItem.toString()
+                val valorEmTexto = campoValor.text.toString()
+                val dataEmTexto = campoData.text.toString()
+                val categoriaEmTexto = campoCategoria.selectedItem.toString()
                 //
                 val valor = convertCampoValor(valorEmTexto)
                 val data = dataEmTexto.converteParaCalendar()
 
                 val transacaoCriada = Transacao(
-                    tipo = Tipo.RECEITA,
+                    tipo = tipo,
                     valor = valor,
                     categoria = categoriaEmTexto,
                     data = data
@@ -55,6 +61,13 @@ class AdicionaTransacaoDialog(
             }
             setNegativeButton("Cancelar ", null)
         }.show()
+    }
+
+    private fun tituloPorTipo(tipo: Tipo): Int {
+        if (tipo == Tipo.RECEITA) {
+            return R.string.adiciona_receita
+        }
+        return R.string.adiciona_despesa
     }
 
     private fun convertCampoValor(valorEmTexto: String): BigDecimal {
@@ -71,18 +84,28 @@ class AdicionaTransacaoDialog(
         }
     }
 
-    private fun configuraCampoCategoria() {
+    private fun configuraCampoCategoria(tipo: Tipo) {
+
+        val categorias = categoriaPorTipo(tipo)
+
         val mAdapter =
             ArrayAdapter
                 .createFromResource(
                     context,
-                    R.array.categorias_de_receita,
+                    categorias,
                     android.R.layout.simple_spinner_dropdown_item
                 )
         //
-        dialogView.form_transacao_categoria.apply {
+        campoCategoria.apply {
             adapter = mAdapter
         }
+    }
+
+    private fun categoriaPorTipo(tipo: Tipo): Int {
+        if (tipo == Tipo.RECEITA) {
+            return R.array.categorias_de_receita
+        }
+        return R.array.categorias_de_despesa
     }
 
     private fun configuraCampoData() {
@@ -92,7 +115,7 @@ class AdicionaTransacaoDialog(
         val mes = hoje.get(Calendar.MONTH)
         val dia = hoje.get(Calendar.DAY_OF_MONTH)
 
-        dialogView.form_transacao_data.apply {
+        campoData.apply {
             setText(hoje.getBrFormattedDate())
             //
             setOnClickListener {
@@ -101,7 +124,7 @@ class AdicionaTransacaoDialog(
                     DatePickerDialog.OnDateSetListener { _, ano, mes, dia ->
                         val dataSelecionada = Calendar.getInstance()
                         dataSelecionada.set(ano, mes, dia)
-                        form_transacao_data.setText(dataSelecionada.getBrFormattedDate())
+                        campoData.setText(dataSelecionada.getBrFormattedDate())
                     },
                     ano,
                     mes,

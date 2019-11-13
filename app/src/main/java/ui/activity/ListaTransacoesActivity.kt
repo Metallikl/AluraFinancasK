@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dluche.R
 import delegate.TransacaoDelegate
 import kotlinx.android.synthetic.main.activity_lista_transacoes.*
+import model.Tipo
 import model.Transacao
 import ui.ResumoView
 import ui.adapter.ListaTransacoesAdapter
@@ -25,22 +26,33 @@ class ListaTransacoesActivity : AppCompatActivity() {
         //
         configuraLista()
         //
-        //region AddReceita
+        configurFab()
+    }
+
+    private fun configurFab() {
         lista_transacoes_adiciona_receita
             .setOnClickListener {
-                AdicionaTransacaoDialog(
-                    this,
-                    window.decorView as ViewGroup
-                )
-                .configuraDialog(object : TransacaoDelegate{
-                    override fun delegate(transacao: Transacao) {
-                        atualizaTransacoes(transacao)
-                        lista_transacoes_adiciona_menu.close(true)
-                    }
-                })
+                chamaDialogDeAdicao(Tipo.RECEITA)
 
             }
-        //endregion
+        //
+        lista_transacoes_adiciona_despesa
+            .setOnClickListener {
+                chamaDialogDeAdicao(Tipo.DESPESA)
+            }
+    }
+
+    private fun chamaDialogDeAdicao(tipo: Tipo) {
+        AdicionaTransacaoDialog(
+            this,
+            window.decorView as ViewGroup
+        )
+         .chama(tipo, object : TransacaoDelegate {
+                override fun delegate(transacao: Transacao) {
+                    atualizaTransacoes(transacao)
+                    lista_transacoes_adiciona_menu.close(true)
+                }
+         })
     }
 
     private fun atualizaTransacoes(transacao: Transacao) {
