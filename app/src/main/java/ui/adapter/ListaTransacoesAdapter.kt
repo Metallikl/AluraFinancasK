@@ -1,12 +1,12 @@
 package ui.adapter
 
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dluche.R
+import delegate.TransacaoClickDelegate
 import extention.getBrFormattedDate
 import extention.getBrFormattedDecimal
 import extention.limitaEmAte
@@ -16,8 +16,7 @@ import model.Transacao
 
 private const val limiteDaCategoria = 14
 
-class ListaTransacoesAdapter(private val transacoes: List<Transacao>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
+class ListaTransacoesAdapter(private val transacoes: List<Transacao>, private val onItemClickListner: TransacaoClickDelegate) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.transacao_item,parent,false)
@@ -30,7 +29,7 @@ class ListaTransacoesAdapter(private val transacoes: List<Transacao>) : Recycler
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val transacaoItem = holder as TransacoesItem
-        transacaoItem.bindData(transacoes[position])
+        transacaoItem.bindData(transacoes[position], onItemClickListner)
     }
 
     class TransacoesItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -40,13 +39,20 @@ class ListaTransacoesAdapter(private val transacoes: List<Transacao>) : Recycler
         private val data = itemV.transacao_data
         private val valor = itemV.transacao_valor
 
-        fun bindData(itemS : Transacao){
+        fun bindData(itemS: Transacao, onItemClickListner: TransacaoClickDelegate){
+            defineClick(itemS,onItemClickListner)
             defineData(itemS)
             defineValor(itemS)
             defineCategoria(itemS)
             //
             defineValorTextColor(itemS.tipo)
             defineIcon(itemS.tipo)
+        }
+
+        private fun defineClick(itemS: Transacao,onItemClickListner: TransacaoClickDelegate) {
+            itemV.setOnClickListener(View.OnClickListener {
+                onItemClickListner.onItemClick(adapterPosition, itemS)
+            })
         }
 
         private fun defineCategoria(itemS: Transacao) {

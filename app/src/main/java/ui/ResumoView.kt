@@ -11,7 +11,7 @@ import model.Resumo
 import model.Transacao
 import java.math.BigDecimal
 
-class ResumoView(private val context : Context,
+class ResumoView(context : Context,
                  private val view: View,
                  transacoes:  List<Transacao>) {
 
@@ -27,6 +27,7 @@ class ResumoView(private val context : Context,
 
     private fun adicionaReceita() {
         val totalReceita = resumo.receita
+
         view.resumo_card_receita.apply {
             text = totalReceita.getBrFormattedDecimal()
             setTextColor(corReceita)
