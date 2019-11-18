@@ -1,6 +1,7 @@
 package ui.activity
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,9 +62,9 @@ class ListaTransacoesActivity : AppCompatActivity() {
             this,
             viewGroupAct
         ).chama(tipo) { transacaoCriada ->
-                adiciona(transacaoCriada)
-                lista_transacoes_adiciona_menu.close(true)
-            }
+            adiciona(transacaoCriada)
+            lista_transacoes_adiciona_menu.close(true)
+        }
     }
 
     private fun adiciona(transacao: Transacao) {
@@ -96,8 +97,24 @@ class ListaTransacoesActivity : AppCompatActivity() {
             { position, transacao ->
                 chamaDialogDeAlteracao(transacao, position)
             }
-
         }
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        val idDoMenu = item.itemId
+        //
+        if (idDoMenu == 1) {
+            val adapater = lista_transacoes_listview.adapter as ListaTransacoesAdapter
+            val posicaoDaTransacao = adapater.mPosition
+            remove(posicaoDaTransacao)
+        }
+        //
+        return super.onContextItemSelected(item)
+    }
+
+    private fun remove(posicao: Int) {
+        transacoes.removeAt(posicao)
+        atualizaTransacoes()
     }
 
     private fun chamaDialogDeAlteracao(transacao: Transacao, position: Int) {

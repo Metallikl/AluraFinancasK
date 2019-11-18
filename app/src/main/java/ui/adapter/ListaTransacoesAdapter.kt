@@ -1,6 +1,7 @@
 package ui.adapter
 
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -21,6 +22,8 @@ class ListaTransacoesAdapter(
     private val onItemClickListner: (position: Int, transacao: Transacao) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    var mPosition: Int = 0
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val viewItem =
             LayoutInflater.from(parent.context).inflate(R.layout.transacao_item, parent, false)
@@ -33,7 +36,7 @@ class ListaTransacoesAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val transacaoItem = holder as TransacoesItem
-        transacaoItem.bindData(transacoes[position], onItemClickListner)
+        transacaoItem.bindData(transacoes[position], onItemClickListner, this)
     }
 
     class TransacoesItem(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -45,15 +48,43 @@ class ListaTransacoesAdapter(
 
         fun bindData(
             itemS: Transacao,
-            onItemClickListner: (position: Int, transacao: Transacao) -> Unit
+            onItemClickListner: (position: Int, transacao: Transacao) -> Unit,
+            listaTransacoesAdapter: ListaTransacoesAdapter
         ) {
             defineClick(itemS, onItemClickListner)
+            defineLongClick(itemS,listaTransacoesAdapter)
             defineData(itemS)
             defineValor(itemS)
             defineCategoria(itemS)
             //
             defineValorTextColor(itemS.tipo)
             defineIcon(itemS.tipo)
+        }
+
+
+
+        private fun defineLongClick(
+            itemS: Transacao,
+            listaTransacoesAdapter: ListaTransacoesAdapter
+        ) {
+            //
+            itemV.apply {
+                setOnCreateContextMenuListener { menu, _, _ ->
+                    menu.add(
+                        Menu.NONE,//Id do Grupo de menu. No caso não importe usamos o none
+                        1,//Id do item do menu,
+                        Menu.NONE,//Ordenação do item, como só teremos 1 item, usaremos none
+                        "Remover"//Titulo do menu
+                    )
+                    listaTransacoesAdapter.mPosition = adapterPosition
+                }
+//                setOnLongClickListener{
+//                    listaTransacoesAdapter.mPosition = adapterPosition
+//                    true
+//                }
+            }
+            //
+
         }
 
         private fun defineClick(
