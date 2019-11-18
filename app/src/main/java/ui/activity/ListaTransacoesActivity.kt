@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dluche.R
-import delegate.TransacaoClickDelegate
 import kotlinx.android.synthetic.main.activity_lista_transacoes.*
 import model.Tipo
 import model.Transacao
@@ -91,12 +90,12 @@ class ListaTransacoesActivity : AppCompatActivity() {
                 false
             )
             adapter = ListaTransacoesAdapter(
-                transacoes,
-                object : TransacaoClickDelegate {
-                    override fun onItemClick(position: Int, transacao: Transacao) {
-                        chamaDialogDeAlteracao(transacao, position)
-                    }
-                })
+                transacoes
+            )
+            //Transformado delgate em HoF
+            { position, transacao ->
+                chamaDialogDeAlteracao(transacao, position)
+            }
 
         }
     }

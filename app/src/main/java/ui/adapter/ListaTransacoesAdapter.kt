@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.dluche.R
-import delegate.TransacaoClickDelegate
 import extention.getBrFormattedDate
 import extention.getBrFormattedDecimal
 import extention.limitaEmAte
@@ -16,15 +15,20 @@ import model.Transacao
 
 private const val limiteDaCategoria = 14
 
-class ListaTransacoesAdapter(private val transacoes: List<Transacao>, private val onItemClickListner: TransacaoClickDelegate) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ListaTransacoesAdapter(
+    private val transacoes: List<Transacao>,
+    //Recebe HoF ao inves da interface
+    private val onItemClickListner: (position: Int, transacao: Transacao) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val viewItem = LayoutInflater.from(parent.context).inflate(R.layout.transacao_item,parent,false)
+        val viewItem =
+            LayoutInflater.from(parent.context).inflate(R.layout.transacao_item, parent, false)
         return TransacoesItem(viewItem)
     }
 
     override fun getItemCount(): Int {
-       return transacoes.size
+        return transacoes.size
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -39,8 +43,11 @@ class ListaTransacoesAdapter(private val transacoes: List<Transacao>, private va
         private val data = itemV.transacao_data
         private val valor = itemV.transacao_valor
 
-        fun bindData(itemS: Transacao, onItemClickListner: TransacaoClickDelegate){
-            defineClick(itemS,onItemClickListner)
+        fun bindData(
+            itemS: Transacao,
+            onItemClickListner: (position: Int, transacao: Transacao) -> Unit
+        ) {
+            defineClick(itemS, onItemClickListner)
             defineData(itemS)
             defineValor(itemS)
             defineCategoria(itemS)
@@ -49,9 +56,12 @@ class ListaTransacoesAdapter(private val transacoes: List<Transacao>, private va
             defineIcon(itemS.tipo)
         }
 
-        private fun defineClick(itemS: Transacao,onItemClickListner: TransacaoClickDelegate) {
+        private fun defineClick(
+            itemS: Transacao,
+            onItemClickListner: (position: Int, transacao: Transacao) -> Unit
+        ) {
             itemV.setOnClickListener(View.OnClickListener {
-                onItemClickListner.onItemClick(adapterPosition, itemS)
+                onItemClickListner(adapterPosition, itemS)
             })
         }
 
@@ -69,21 +79,21 @@ class ListaTransacoesAdapter(private val transacoes: List<Transacao>, private va
 
         private fun defineIcon(tipo: Tipo) {
             val icon: Int =
-            when(tipo){
-                Tipo.RECEITA -> R.drawable.icone_transacao_item_receita
-                else -> R.drawable.icone_transacao_item_despesa
-            }
+                when (tipo) {
+                    Tipo.RECEITA -> R.drawable.icone_transacao_item_receita
+                    else -> R.drawable.icone_transacao_item_despesa
+                }
             //
             icone.setBackgroundResource(icon)
         }
 
-        fun defineValorTextColor(tipo: Tipo){
-            val cor : Int = when(tipo){
-                            Tipo.RECEITA -> R.color.receita
-                            else -> R.color.despesa
-                        }
+        fun defineValorTextColor(tipo: Tipo) {
+            val cor: Int = when (tipo) {
+                Tipo.RECEITA -> R.color.receita
+                else -> R.color.despesa
+            }
             //
-            valor.setTextColor(ContextCompat.getColor(itemV.context,cor))
+            valor.setTextColor(ContextCompat.getColor(itemV.context, cor))
         }
     }
 }
