@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dluche.R
 import delegate.TransacaoClickDelegate
-import delegate.TransacaoDelegate
 import kotlinx.android.synthetic.main.activity_lista_transacoes.*
 import model.Tipo
 import model.Transacao
@@ -27,7 +26,7 @@ class ListaTransacoesActivity : AppCompatActivity() {
         window.decorView
     }
     //Properties que utilizem properties inicializadas by lazy, também tem que ter sua inicialização by lazy
-    private val viewGroupAct by lazy{
+    private val viewGroupAct by lazy {
         viewAct as ViewGroup
     }
 
@@ -42,6 +41,7 @@ class ListaTransacoesActivity : AppCompatActivity() {
         configuraLista()
         //
         configurFab()
+        //
     }
 
     private fun configurFab() {
@@ -61,13 +61,10 @@ class ListaTransacoesActivity : AppCompatActivity() {
         AdicionaTransacaoDialog(
             this,
             viewGroupAct
-        )
-         .chama(tipo, object : TransacaoDelegate {
-                override fun delegate(transacao: Transacao) {
-                    adiciona(transacao)
-                    lista_transacoes_adiciona_menu.close(true)
-                }
-         })
+        ).chama(tipo) { transacaoCriada ->
+                adiciona(transacaoCriada)
+                lista_transacoes_adiciona_menu.close(true)
+            }
     }
 
     private fun adiciona(transacao: Transacao) {
@@ -95,7 +92,7 @@ class ListaTransacoesActivity : AppCompatActivity() {
             )
             adapter = ListaTransacoesAdapter(
                 transacoes,
-                object : TransacaoClickDelegate{
+                object : TransacaoClickDelegate {
                     override fun onItemClick(position: Int, transacao: Transacao) {
                         chamaDialogDeAlteracao(transacao, position)
                     }
@@ -107,13 +104,10 @@ class ListaTransacoesActivity : AppCompatActivity() {
     private fun chamaDialogDeAlteracao(transacao: Transacao, position: Int) {
         AlteraTransacaoDialog(this@ListaTransacoesActivity, viewAct as ViewGroup)
             .chama(
-                transacao,
-                object : TransacaoDelegate {
-                    override fun delegate(transacao: Transacao) {
-                        altera(transacao, position)
-                    }
-                }
-            )
+                transacao
+            ) { transacaoAlterada ->
+                altera(transacaoAlterada, position)
+            }
     }
 
     private fun altera(transacao: Transacao, position: Int) {
