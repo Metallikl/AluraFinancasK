@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dluche.R
+import dao.TransacaoDao
 import kotlinx.android.synthetic.main.activity_lista_transacoes.*
 import model.Tipo
 import model.Transacao
@@ -13,11 +14,13 @@ import ui.ResumoView
 import ui.adapter.ListaTransacoesAdapter
 import ui.dialog.AdicionaTransacaoDialog
 import ui.dialog.AlteraTransacaoDialog
+import java.math.BigDecimal
 
 
 class ListaTransacoesActivity : AppCompatActivity() {
 
-    private val transacoes: MutableList<Transacao> = mutableListOf()
+    private val dao = TransacaoDao()
+    private val transacoes = dao.transacoes
     //Inicialização "preguiçosa" significa que a inicialização será feita
     //somente no primeiro momento em que propertie for ser utilizada.
     //Ou seja, essa incialização será feita no primeiro momento em que a var viewAct for ser usada.
@@ -68,7 +71,7 @@ class ListaTransacoesActivity : AppCompatActivity() {
     }
 
     private fun adiciona(transacao: Transacao) {
-        transacoes.add(transacao)
+        dao.adiciona(transacao)
         atualizaTransacoes()
     }
 
@@ -113,7 +116,7 @@ class ListaTransacoesActivity : AppCompatActivity() {
     }
 
     private fun remove(posicao: Int) {
-        transacoes.removeAt(posicao)
+        dao.remove(posicao)
         atualizaTransacoes()
     }
 
@@ -127,7 +130,7 @@ class ListaTransacoesActivity : AppCompatActivity() {
     }
 
     private fun altera(transacao: Transacao, position: Int) {
-        transacoes[position] = transacao
+        dao.altera(transacao,position)
         atualizaTransacoes()
     }
 }
